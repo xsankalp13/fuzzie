@@ -46,5 +46,5 @@ export {
     p6,
     promemberscall,
     slack,
-    tempBanner
+    tempBanner,
 }
