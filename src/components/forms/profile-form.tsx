@@ -1,6 +1,6 @@
 'use client'
 import { EditUserProfileSchema } from '@/lib/Types';
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,26 +8,41 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { Loader2 } from 'lucide-react';
+import { User } from '@prisma/client';
 
-type Props = {}
+type Props = {
+    user: any,
+    onUpdate?: any
+}
 
-const ProfileForm = (props: Props) => {
+const ProfileForm = ({user, onUpdate}: Props) => {
     const [isLoading, setIsLoading] = React.useState(false);
     const form = useForm<z.infer<typeof EditUserProfileSchema>>({
         mode: 'onChange',
         resolver: zodResolver(EditUserProfileSchema),
         defaultValues: {
-            email: '',
-            name: '',
+            email: user.email ,
+            name: user.name,
         }
     });
-    const HandleClick = (e:React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
+    const HandleClick = async (e:React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         setIsLoading(prev => !prev);
     }
+    const HandleSubmit =async (
+        values: z.infer<typeof EditUserProfileSchema>
+    ) => {
+        setIsLoading(true)
+        await onUpdate(values.name)
+        setIsLoading(false)   
+    }
+
+    useEffect(() => {
+        form.reset({name:user.name, email:user.email})
+    }, [user])
   return (
     <Form {...form}>
-        <form className='flex flex-col gap-6' onSubmit={() => {}}>
+        <form className='flex flex-col gap-6' onSubmit={form.handleSubmit(HandleSubmit)}>
             <FormField 
                 disabled={isLoading} 
                 control={form.control} 
@@ -67,7 +82,6 @@ const ProfileForm = (props: Props) => {
             <Button
                 type='submit'
                 className='self-start hover:bg-[#2F006B] hover:text-white'
-                onClick={HandleClick}
 
             >
                 {

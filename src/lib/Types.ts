@@ -1,3 +1,4 @@
+import { ConnectionProviderProps } from '@/providers/connection-provider'
 import { z } from 'zod'
 
 export type PlanCardsProps = {
@@ -8,6 +9,18 @@ export type PlanCardsProps = {
 }
 
 export const EditUserProfileSchema = z.object({
-    email: z.string().email('Required'),
+    email: z.string().email(),
     name: z.string().min(5, 'Required'),
 })
+
+export type ConnectionTypes = 'Google Drive' | 'Notion' | 'Slack' | 'Discord'
+
+export type Connection = {
+    title: ConnectionTypes
+    description: string
+    image: string
+    connectionKey: keyof ConnectionProviderProps
+    accessTokenKey?: string
+    alwaysTrue?: boolean
+    slackSpecial?:boolean
+}
